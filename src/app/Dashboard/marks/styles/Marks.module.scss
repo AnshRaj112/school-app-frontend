@@ -1,0 +1,110 @@
+
+.marks {
+  background: #f4faff; // soft background
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(24, 99, 146, 0.11);
+
+  .topRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2.2rem;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .button {
+    background: linear-gradient(90deg,#4fa3e3 55%, #398bc7 100%);
+    color: #fff;
+    padding: 0.54rem 1.55rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.08rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(70,140,200,0.08);
+    transition: background 0.22s, box-shadow 0.22s;
+    &:hover {
+      background: #3071b8;
+      box-shadow: 0 6px 22px rgba(64, 134, 200, 0.13);
+    }
+    &:active {
+      background: #185a96;
+    }
+  }
+
+  .dropdown {
+    min-width: 115px;
+    padding: 0.48rem 1.12rem;
+    border: 1.7px solid #72c2df;
+    border-radius: 8px;
+    font-size: 1.06rem;
+    margin-right: 0.33rem;
+    background: #fafffc;
+    &:focus {
+      border-color: #309ce9;
+      box-shadow: 0 0 0 1.5px #a3eaff;
+      background: #f0fbff;
+    }
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1.2rem;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 14px rgba(35, 154, 205, 0.08);
+    th, td {
+      border: none;
+      padding: 0.5rem 1rem;
+      text-align: center;
+      font-size: 1.07rem;
+    }
+    th {
+      background: linear-gradient(90deg, #b2dfdb 60%, #e0f7fa 100%);
+      font-weight: 700;
+    }
+    tr {
+      background: #ffffff;
+      transition: background 0.24s;
+      &:hover {
+        background: #f1fbff;
+      }
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  .marksInputNoBorder {
+  width: 65px;
+  padding: 0.33rem 0.33rem;
+  border: none;
+  border-bottom: 1.5px solid #b2dfdb;
+  border-radius: 0;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  transition: border-bottom 0.18s;
+  text-align: center;
+
+  /* Hide number input spinners */
+  -moz-appearance: textfield;
+}
+
+.marksInputNoBorder::-webkit-inner-spin-button, 
+.marksInputNoBorder::-webkit-outer-spin-button { 
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+}

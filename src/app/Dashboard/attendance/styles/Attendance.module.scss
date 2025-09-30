@@ -1,0 +1,44 @@
+.attendance {
+  background: #f5f7fa;
+  padding: 1rem;
+  border-radius: 8px;
+
+  h2 {
+    margin-bottom: 1rem;
+    text-align: center;
+    font-size: large;
+    font-weight: bold;
+  }
+
+  .buttons {
+    margin-bottom: 1rem;
+    button {
+      margin-right: 1rem;
+      background: #2980b9;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      &:hover {
+        background: #1f6391;
+      }
+    }
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      cursor: pointer;
+    }
+  }
+}
