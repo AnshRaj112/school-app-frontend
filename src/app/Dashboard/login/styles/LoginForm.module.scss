@@ -1,0 +1,123 @@
+.pageBg {
+  min-height: 100vh;
+  background: #f6f7f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loginCard {
+  background: #e7e8ea;
+  border-radius: 20px;
+  padding: 2.9rem 2.4rem 2.2rem 2.4rem;
+  max-width: 390px;
+  width: 100%;
+  box-shadow: 0 6px 30px 0 rgba(87,98,111,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loginTitle {
+  font-size: 2.3rem;
+  color: #181818;
+  margin-bottom: 2rem;
+  font-weight: 500;
+  text-align: center;
+  font-family: inherit;
+}
+
+.loginForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.loginForm input[type="text"],
+.loginForm input[type="password"] {
+  width: 100%;
+  border-radius: 7px;
+  border: 1.6px solid #b6c2cc;
+  color: #181818;
+  padding: 1rem 1.1rem;
+  font-size: 1.13rem;
+  outline: none;
+  margin-bottom: 1.1rem;
+  transition: border-color 0.17s;
+}
+
+.passwordRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordRow input[type="password"] {
+  flex: 1;
+  margin-right: 0;
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 17px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.21rem;
+  color: #79adad;
+  cursor: pointer;
+  user-select: none;
+}
+
+.actionRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.6rem;
+}
+
+.forgotPassword {
+  color: #63b1b6;
+  font-size: 1.05rem;
+  text-decoration: none;
+  transition: color 0.18s;
+  &:hover {
+    color: #197a7a;
+  }
+}
+
+.loginBtn {
+  width: 100%;
+  padding: 0.93rem 0;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.4rem;
+  cursor: pointer;
+  transition: background 0.17s;
+  &:hover {
+    background: #166534;
+  }
+}
+
+.signUpRow {
+  text-align: center;
+  font-size: 1.08rem;
+  color: #222;
+  margin-top: 0.4rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.signUpLink {
+  color: #63b1b6;
+  text-decoration: none;
+  transition: color 0.17s;
+  font-weight: 500;
+  &:hover {
+    color: #166534;
+  }
+}
