@@ -38,7 +38,7 @@ export default function TeacherLogin() {
           </div>
           <button type="submit" className={styles.loginBtn}>Login</button>
           <div className={styles.signUpRow}>
-            <span>Don't have an account?</span>
+            <span>Don&apos;t have an account?</span>
             <a href="#" className={styles.signUpLink}>Sign Up</a>
           </div>
         </form>
