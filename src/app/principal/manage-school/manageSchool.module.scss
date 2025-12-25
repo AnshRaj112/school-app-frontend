@@ -1,0 +1,97 @@
+.container {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.loading {
+  padding: 24px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.primary {
+  background: #1a73e8;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.primary:hover {
+  background: #1558b0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.value {
+  font-size: 14px;
+  color: #111827;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+/* 🔥 EDIT MODE FIX */
+.input {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #111827; /* FIX: visible text */
+  background: #ffffff; /* FIX: clear contrast */
+  border-radius: 8px;
+  border: 1px solid #9ca3af; /* FIX: darker border */
+  transition: border 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+}
+
+/* Subtle edit-mode cue */
+.field:has(.input) .label {
+  color: #1a73e8;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
