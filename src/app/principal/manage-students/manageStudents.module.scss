@@ -1,0 +1,40 @@
+.container {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+
+.title {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+.primary {
+  background: #1a73e8;
+  color: #ffffff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+
+  &:hover {
+    background: #1558b0;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  padding: 14px 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+}

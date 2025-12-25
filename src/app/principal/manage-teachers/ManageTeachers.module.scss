@@ -1,0 +1,234 @@
+/* palette */
+$primary: #1a73e8;
+$accent: #111827;
+$muted: #6b7280;
+$bg: #f4f6f9;
+$card: #ffffff;
+$border: #e5e7eb;
+$danger-bg: #fee2e2;
+$danger-text: #991b1b;
+
+.container {
+  padding: 24px;
+  background: $bg;
+  min-height: 100vh;
+  box-sizing: border-box;
+  color: $accent;
+}
+
+/* header */
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: $accent;
+}
+
+/* grid of teachers */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: $card;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid $border;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.03);
+}
+
+.inactive {
+  opacity: 0.6;
+}
+
+.name {
+  font-weight: 600;
+  color: $accent;
+}
+
+.meta {
+  font-size: 13px;
+  color: $muted;
+  margin-top: 4px;
+}
+
+/* action buttons */
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.primaryBtn {
+  background: $primary;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 6px 12px rgba(26, 115, 232, 0.12);
+}
+
+.secondaryBtn {
+  background: $card;
+  border: 1px solid $border;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: $accent;
+}
+
+.dangerBtn {
+  background: $danger-bg;
+  color: $danger-text;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* drawer (profile) */
+.drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 420px;
+  height: 100vh;
+  background: $card;
+  padding: 20px;
+  box-shadow: -8px 0 30px rgba(17, 24, 39, 0.12);
+  z-index: 1200;
+  overflow-y: auto;
+}
+
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.drawerName {
+  font-weight: 700;
+  color: $accent;
+  font-size: 16px;
+}
+
+.drawerMeta {
+  color: $muted;
+  font-size: 13px;
+}
+
+/* assignment section */
+.sectionTitle {
+  font-weight: 700;
+  margin: 12px 0;
+  color: $accent;
+}
+
+.assignment {
+  background: #fbfdff;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid lighten($border, 2%);
+}
+
+.assignBox {
+  background: #f7f9fc;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 14px;
+  border: 1px solid $border;
+}
+
+/* inputs & selects */
+.input,
+.select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid $border;
+  background: $card;
+  color: $accent;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* placeholder color */
+.input::placeholder,
+.select::placeholder {
+  color: $muted;
+}
+
+/* focused input ring */
+.input:focus,
+.select:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+  border-color: $primary;
+}
+
+/* modal overlay and modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3); /* lighter than before */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal {
+  background: $card;
+  padding: 20px;
+  border-radius: 12px;
+  width: 420px;
+  box-shadow: 0 12px 40px rgba(17, 24, 39, 0.2);
+  z-index: 2100;
+}
+
+/* modal title and actions */
+.modalTitle {
+  font-weight: 700;
+  color: $accent;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.modalActions,
+.assignActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* small text */
+.small {
+  font-size: 12px;
+  color: $muted;
+}
+
+/* utility */
+.loading {
+  padding: 20px;
+  color: $muted;
+}
