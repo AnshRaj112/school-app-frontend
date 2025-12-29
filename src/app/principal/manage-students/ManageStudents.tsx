@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaUserPlus, FaSearch, FaEdit, FaTrash, FaFilter } from "react-icons/fa";
+import { FaUserPlus, FaSearch, FaEdit, FaTrash } from "react-icons/fa";
 import { toast, Toaster } from "react-hot-toast";
 import styles from "./manageStudents.module.scss";
 import StudentModal from "./StudentModal";
