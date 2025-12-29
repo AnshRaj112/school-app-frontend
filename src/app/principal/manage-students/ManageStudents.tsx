@@ -89,7 +89,7 @@ export default function ManageStudents() {
   // Fetch Classes for Filters
   const fetchClasses = async () => {
     try {
-      const res = await fetch(`${API}/classes?schoolId=${SCHOOL_ID}`);
+      const res = await fetch(`${API}/classes?schoolId=${SCHOOL_ID}&actorId=${ACTOR_ID}`); // Added actorId
       const data = await res.json();
       if (data.classes) setClasses(data.classes);
     } catch (error) {
@@ -100,7 +100,7 @@ export default function ManageStudents() {
   // Fetch Sections for Filters
   const fetchSections = async (classId: string) => {
     try {
-      const res = await fetch(`${API}/sections/by-class?classId=${classId}`);
+      const res = await fetch(`${API}/sections/by-class?classId=${classId}&actorId=${ACTOR_ID}`); // Added actorId
       const data = await res.json();
       if (data.sections) setSections(data.sections);
     } catch (error) {

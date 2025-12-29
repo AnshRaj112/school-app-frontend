@@ -18,7 +18,7 @@ type Teacher = {
 };
 
 type ClassItem = { _id: string; grade: number };
-type Section = { _id: string; name: string };
+type Section = { _id: string; name: string; classId?: { grade: number } };
 type Subject = { _id: string; name: string; code: string };
 
 type Assignment = {
@@ -357,9 +357,9 @@ export default function ManageTeachers() {
           {assignments.map((a) => (
             <div key={a._id} className={styles.assignment}>
               <div>
-                <strong>{a.subjectId.name}</strong>
+                <strong>{a.subjectId?.name || "Unknown Subject"}</strong>
                 <div className={styles.small}>
-                  Section {a.sectionId.name} · {a.academicYear}
+                  Class {a.sectionId?.classId?.grade || "?"} - Sec {a.sectionId?.name || "?"} · {a.academicYear}
                 </div>
               </div>
               <button
