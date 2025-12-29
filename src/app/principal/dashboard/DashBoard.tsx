@@ -14,8 +14,21 @@ interface Principal {
   };
 }
 
+interface Stats {
+  classes: number;
+  sections: number;
+  teachers: number;
+  students: number;
+}
+
 export default function DashboardPage() {
   const [principal, setPrincipal] = useState<Principal | null>(null);
+  const [stats, setStats] = useState<Stats>({
+    classes: 0,
+    sections: 0,
+    teachers: 0,
+    students: 0,
+  });
 
   useEffect(() => {
     async function loadPrincipal() {
@@ -30,6 +43,23 @@ export default function DashboardPage() {
 
       const data = await res.json();
       setPrincipal(data.principal);
+
+      // Fetch Stats if school exists
+      if (data.principal?.school?._id) {
+        fetchStats(data.principal.school._id);
+      }
+    }
+
+    async function fetchStats(schoolId: string) {
+      try {
+        const res = await fetch(`http://localhost:5000/schools/${schoolId}/stats`);
+        const data = await res.json();
+        if (data.success) {
+          setStats(data.stats);
+        }
+      } catch (err) {
+        console.error("Failed to fetch stats");
+      }
     }
 
     loadPrincipal();
@@ -45,19 +75,19 @@ export default function DashboardPage() {
       <div className={styles.stats}>
         <div className={styles.card}>
           <span>Classes</span>
-          <strong>—</strong>
+          <strong>{stats.classes}</strong>
         </div>
         <div className={styles.card}>
           <span>Sections</span>
-          <strong>—</strong>
+          <strong>{stats.sections}</strong>
         </div>
         <div className={styles.card}>
           <span>Teachers</span>
-          <strong>—</strong>
+          <strong>{stats.teachers}</strong>
         </div>
         <div className={styles.card}>
           <span>Students</span>
-          <strong>—</strong>
+          <strong>{stats.students}</strong>
         </div>
       </div>
     </>

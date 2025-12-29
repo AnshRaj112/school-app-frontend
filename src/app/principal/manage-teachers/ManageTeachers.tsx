@@ -141,6 +141,7 @@ export default function ManageTeachers() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             actorId: ACTOR_ID,
+            username: form.username, // Added username to payload
             fullName: form.fullName,
             email: form.email,
             roles: [form.role],
@@ -267,28 +268,45 @@ export default function ManageTeachers() {
 
       <div className={styles.grid}>
         {loading ? (
-          <div className={styles.loading}>Loading…</div>
+          <div className={styles.loading}>Loading Teachers...</div>
         ) : (
           teachers.map((t) => (
             <div
               key={t._id}
               className={`${styles.card} ${!t.isActive ? styles.inactive : ""}`}
             >
-              <div>
-                <div className={styles.name}>{t.fullName}</div>
-                <div className={styles.meta}>{t.email}</div>
+              <div className={styles.cardHeader}>
+                <div className={styles.avatar}>
+                  {t.fullName.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()}
+                </div>
+                <div className={styles.info}>
+                  <div className={styles.name}>{t.fullName}</div>
+                  <div className={styles.email}>{t.email}</div>
+                  <div className={styles.badges}>
+                    {t.roles.includes("class_teacher") ? (
+                      <span className={`${styles.roleBadge} ${styles.classTeacher}`}>Class Teacher</span>
+                    ) : (
+                      <span className={`${styles.roleBadge} ${styles.subjectTeacher}`}>Subject Teacher</span>
+                    )}
+
+                    <span className={`${styles.statusBadge} ${t.isActive ? styles.active : styles.inactive}`}>
+                      {t.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className={styles.actions}>
                 <button
-                  className={styles.secondaryBtn}
+                  className={`${styles.btn} ${styles.outline}`}
                   onClick={() => openProfile(t)}
+                  title="View Profile"
                 >
                   View
                 </button>
 
                 <button
-                  className={styles.secondaryBtn}
+                  className={`${styles.btn} ${styles.outline}`}
                   onClick={() => {
                     setEditing(t);
                     setForm({
@@ -300,13 +318,15 @@ export default function ManageTeachers() {
                     });
                     setFormOpen(true);
                   }}
+                  title="Edit Details"
                 >
                   Edit
                 </button>
 
                 <button
-                  className={styles.dangerBtn}
+                  className={`${styles.btn} ${styles.danger}`}
                   onClick={() => toggleTeacher(t)}
+                  title="Toggle Status"
                 >
                   {t.isActive ? "Deactivate" : "Activate"}
                 </button>
@@ -449,7 +469,7 @@ export default function ManageTeachers() {
               className={styles.input}
               placeholder="Username"
               value={form.username}
-              disabled={!!editing}
+              // disabled={!!editing}  <-- REMOVED disabled check
               onChange={(e) => setForm({ ...form, username: e.target.value })}
             />
 
