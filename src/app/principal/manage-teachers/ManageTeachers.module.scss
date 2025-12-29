@@ -1,0 +1,341 @@
+/* palette */
+$primary: #2563eb;
+$primary-light: #eff6ff;
+$accent: #1f2937;
+$muted: #6b7280;
+$bg: #f3f4f6;
+$card: #ffffff;
+$border: #e5e7eb;
+$danger: #ef4444;
+$danger-bg: #fef2f2;
+$success: #10b981;
+$success-bg: #ecfdf5;
+
+.container {
+  padding: 32px;
+  background: $bg;
+  min-height: 100vh;
+  box-sizing: border-box;
+  color: $accent;
+  font-family: 'Inter', sans-serif;
+}
+
+/* header */
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: $accent;
+}
+
+/* grid of teachers */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: $card;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid $border;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.inactive {
+  opacity: 0.7;
+  filter: grayscale(0.8);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  background: $primary-light;
+  color: $primary;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.info {
+  flex: 1;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 16px;
+  color: $accent;
+  margin-bottom: 4px;
+}
+
+.email {
+  font-size: 13px;
+  color: $muted;
+}
+
+.badges {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.roleBadge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.classTeacher {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+
+  &.subjectTeacher {
+    background: $success-bg;
+    color: $success;
+  }
+}
+
+.statusBadge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+
+  &.active {
+    background: $success-bg;
+    color: $success;
+  }
+
+  &.inactive {
+    background: $danger-bg;
+    color: $danger;
+  }
+}
+
+
+/* action buttons */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  border-top: 1px solid $border;
+  padding-top: 16px;
+}
+
+.btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+
+  &.primary {
+    background: $primary;
+    color: white;
+
+    &:hover {
+      background: darken($primary, 5%);
+    }
+  }
+
+  &.outline {
+    background: transparent;
+    border: 1px solid $border;
+    color: $accent;
+
+    &:hover {
+      background: $bg;
+      border-color: darken($border, 10%);
+    }
+  }
+
+  &.danger {
+    background: transparent;
+    border: 1px solid $danger-bg;
+    color: $danger;
+
+    &:hover {
+      background: $danger-bg;
+    }
+  }
+}
+
+/* drawer (profile) */
+.drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 480px;
+  height: 100vh;
+  background: $card;
+  padding: 32px;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+  z-index: 1200;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.drawerName {
+  font-weight: 700;
+  color: $accent;
+  font-size: 24px;
+}
+
+.drawerMeta {
+  color: $muted;
+  font-size: 14px;
+}
+
+/* assignment section */
+.sectionTitle {
+  font-weight: 700;
+  margin: 24px 0 16px;
+  color: $accent;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.assignment {
+  background: $bg;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: darken($bg, 10%);
+  }
+}
+
+.assignBox {
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  margin-top: 24px;
+  border: 1px solid $border;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* inputs & selects */
+.input,
+.select {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  border: 1px solid $border;
+  background: #f9fafb;
+  color: $accent;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+/* placeholder color */
+.input::placeholder,
+.select::placeholder {
+  color: $muted;
+}
+
+/* focused input ring */
+.input:focus,
+.select:focus {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 3px $primary-light;
+  border-color: $primary;
+}
+
+/* modal overlay and modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal {
+  background: $card;
+  padding: 32px;
+  border-radius: 20px;
+  width: 480px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  z-index: 2100;
+}
+
+/* modal title and actions */
+.modalTitle {
+  font-weight: 800;
+  color: $accent;
+  margin-bottom: 24px;
+  font-size: 20px;
+}
+
+.modalActions,
+.assignActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* utility */
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: $muted;
+  font-size: 16px;
+}
