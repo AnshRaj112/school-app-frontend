@@ -9,6 +9,7 @@ export default function LandingPage() {
       <h1 className={styles.title}>Welcome to School Portal</h1>
       <div className={styles.roleGrid}>
         <Link href="/Dashboard/login" className={styles.roleBtn}>Login as Teacher</Link>
+        <Link href="/student/dashboard" className={styles.roleBtn}>Student Dashboard</Link>
         {/* <Link href="/login/student" className={styles.roleBtn}>Login as Student</Link>
         <Link href="/login/principal" className={styles.roleBtn}>Login as Principal</Link>
         <Link href="/login/admin" className={styles.roleBtn}>Login as Admin</Link> */}
