@@ -2,10 +2,213 @@
 
 import { useEffect, useMemo, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import styles from "./studentDashboard.module.scss";
-import { STUDENT_ID_STORAGE_KEY } from "../constants";
+import { API, STUDENT_ID_STORAGE_KEY } from "../constants";
 
 type DashboardData = any;
+
+function AttendanceCalendar({
+  records,
+  holidays = [],
+  halfDayRequests = [],
+}: {
+  records: any[];
+  holidays?: any[];
+  halfDayRequests?: any[];
+}) {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+  const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+  const startDate = new Date(monthStart);
+  startDate.setDate(startDate.getDate() - startDate.getDay());
+
+  const days: Date[] = [];
+  for (let i = 0; i < 42; i++) {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    days.push(date);
+  }
+
+  const isSchoolHoliday = (date: Date): { isHoliday: boolean; title?: string } => {
+    const dateStr = date.toISOString().split("T")[0];
+    const holiday = holidays.find((h) => {
+      if (!h.date) return false;
+      const holidayDate = new Date(h.date);
+      holidayDate.setHours(0, 0, 0, 0);
+      const checkDate = new Date(date);
+      checkDate.setHours(0, 0, 0, 0);
+      return holidayDate.getTime() === checkDate.getTime();
+    });
+    return holiday ? { isHoliday: true, title: holiday.title } : { isHoliday: false };
+  };
+
+  const getAttendanceStatus = (date: Date): { status: string | null; halfDayType?: string } => {
+    const dateStr = date.toISOString().split("T")[0];
+    const record = records.find((r) => r.date?.startsWith(dateStr));
+    if (record) {
+      return { status: record.status, halfDayType: record.halfDayType };
+    }
+    // Check approved half-day requests
+    const halfDay = halfDayRequests.find(
+      (h) => h.status === "approved" && h.date?.startsWith(dateStr)
+    );
+    if (halfDay) {
+      return { status: "half_day", halfDayType: halfDay.halfDayType };
+    }
+    return { status: null };
+  };
+
+  const getStatusColor = (status: string | null): string => {
+    if (!status) return "transparent";
+    switch (status) {
+      case "present":
+        return "#10b981";
+      case "absent":
+        return "#ef4444";
+      case "late":
+        return "#f59e0b";
+      case "excused":
+        return "#6b7280";
+      case "half_day":
+        return "#06b6d4";
+      case "holiday":
+        return "#8b5cf6";
+      default:
+        return "transparent";
+    }
+  };
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const prevMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+  };
+
+  const nextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+  };
+
+  return (
+    <div className={styles.calendar}>
+      <div className={styles.calendarHeader}>
+        <button type="button" onClick={prevMonth} className={styles.calendarNav}>
+          ←
+        </button>
+        <h3>
+          {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+        </h3>
+        <button type="button" onClick={nextMonth} className={styles.calendarNav}>
+          →
+        </button>
+      </div>
+      <div className={styles.calendarGrid}>
+        {weekDays.map((day) => (
+          <div key={day} className={styles.calendarDayHeader}>
+            {day}
+          </div>
+        ))}
+        {days.map((date, idx) => {
+          const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
+          const isToday =
+            date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
+          const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+          const schoolHoliday = isSchoolHoliday(date);
+          const isHoliday = isWeekend || schoolHoliday.isHoliday;
+          const attendanceData = isHoliday ? { status: "holiday" as const } : getAttendanceStatus(date);
+          const status = attendanceData.status;
+          const halfDayType = attendanceData.halfDayType;
+
+          return (
+            <div
+              key={idx}
+              className={`${styles.calendarDay} ${!isCurrentMonth ? styles.calendarDayOther : ""} ${
+                isToday ? styles.calendarDayToday : ""
+              } ${isWeekend ? styles.calendarDayWeekend : ""} ${
+                schoolHoliday.isHoliday ? styles.calendarDayHoliday : ""
+              }`}
+              style={{
+                backgroundColor: status
+                  ? getStatusColor(status) + (isHoliday ? "15" : "20")
+                  : "transparent",
+                borderColor: status ? getStatusColor(status) : undefined,
+              }}
+              title={
+                schoolHoliday.isHoliday
+                  ? `Holiday: ${schoolHoliday.title}`
+                  : isWeekend
+                    ? "Weekend"
+                    : status === "half_day"
+                      ? `Half-day (${halfDayType})`
+                      : status
+                        ? `Status: ${status}`
+                        : ""
+              }
+            >
+              <span>{date.getDate()}</span>
+              {isHoliday && <span className={styles.calendarHolidayIcon}>🎉</span>}
+              {status === "half_day" && (
+                <span className={styles.calendarHalfDayBadge}>{halfDayType === "morning" ? "AM" : "PM"}</span>
+              )}
+              {status && !isHoliday && status !== "half_day" && (
+                <span
+                  className={styles.calendarStatusDot}
+                  style={{ backgroundColor: getStatusColor(status) }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div className={styles.calendarLegend}>
+        <div className={styles.legendItem}>
+          <span className={styles.legendDot} style={{ backgroundColor: "#10b981" }} />
+          Present
+        </div>
+        <div className={styles.legendItem}>
+          <span className={styles.legendDot} style={{ backgroundColor: "#ef4444" }} />
+          Absent
+        </div>
+        <div className={styles.legendItem}>
+          <span className={styles.legendDot} style={{ backgroundColor: "#f59e0b" }} />
+          Late
+        </div>
+        <div className={styles.legendItem}>
+          <span className={styles.legendDot} style={{ backgroundColor: "#6b7280" }} />
+          Excused
+        </div>
+        <div className={styles.legendItem}>
+          <span className={styles.legendDot} style={{ backgroundColor: "#06b6d4" }} />
+          Half-Day
+        </div>
+        <div className={styles.legendItem}>
+          <span className={styles.legendDot} style={{ backgroundColor: "#8b5cf6" }} />
+          Holiday
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const USE_FAKE_DATA = true;
 
@@ -19,11 +222,31 @@ const FAKE_DASHBOARD: DashboardData = {
   },
   attendance: {
     summary: { total: 60, present: 54, absent: 4, late: 2, excused: 0 },
-    recent: [],
+    recent: (() => {
+      const records: any[] = [];
+      const today = new Date();
+      for (let i = 0; i < 60; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        // Skip weekends
+        if (date.getDay() === 0 || date.getDay() === 6) continue;
+        let status = "present";
+        if (i % 10 === 0) status = "absent";
+        else if (i % 15 === 0) status = "late";
+        records.push({
+          _id: `ATT_${i}`,
+          date: date.toISOString(),
+          status,
+        });
+      }
+      return records.reverse();
+    })(),
   },
   holidaysUpcoming: [
     { _id: "H1", title: "Festival Break", date: new Date(Date.now() + 10 * 86400000).toISOString() },
     { _id: "H2", title: "Sports Day", date: new Date(Date.now() + 25 * 86400000).toISOString() },
+    { _id: "H3", title: "Independence Day", date: new Date(Date.now() + 5 * 86400000).toISOString() },
+    { _id: "H4", title: "Diwali", date: new Date(Date.now() + 45 * 86400000).toISOString() },
   ],
   timetable: [
     {
@@ -114,7 +337,7 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<DashboardData | null>(null);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "timetable" | "assignments" | "attendance" | "holidays" | "fees" | "submit"
+    "overview" | "timetable" | "assignments" | "attendance" | "holidays" | "fees" | "submit" | "halfday"
   >("overview");
 
   const [feePayment, setFeePayment] = useState({
@@ -131,6 +354,14 @@ export default function StudentDashboard() {
     attachmentUrl: "",
     attachmentName: "",
   });
+
+  const [halfDayRequest, setHalfDayRequest] = useState({
+    date: "",
+    halfDayType: "morning",
+    reason: "",
+  });
+
+  const [halfDayRequests, setHalfDayRequests] = useState<any[]>([]);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STUDENT_ID_STORAGE_KEY);
@@ -164,6 +395,38 @@ export default function StudentDashboard() {
   const timetable = useMemo(() => data?.timetable || [], [data]);
   const holidays = useMemo(() => data?.holidaysUpcoming || [], [data]);
   const attendanceSummary = useMemo(() => data?.attendance?.summary || null, [data]);
+  const attendanceRecords = useMemo(() => data?.attendance?.recent || [], [data]);
+
+  useEffect(() => {
+    if (USE_FAKE_DATA && studentId) {
+      // Load fake half-day requests
+      setHalfDayRequests([
+        {
+          _id: "HD1",
+          date: new Date(Date.now() + 3 * 86400000).toISOString(),
+          halfDayType: "morning",
+          reason: "Medical appointment",
+          status: "pending",
+        },
+        {
+          _id: "HD2",
+          date: new Date(Date.now() - 5 * 86400000).toISOString(),
+          halfDayType: "afternoon",
+          reason: "Family event",
+          status: "approved",
+          verifiedBy: { fullName: "Aarav Patel" },
+        },
+      ]);
+    } else if (studentId) {
+      // Load real half-day requests
+      fetch(`${API}/students/${studentId}/half-day-requests`)
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success) setHalfDayRequests(json.requests || []);
+        })
+        .catch(() => {});
+    }
+  }, [studentId]);
 
   async function payFee() {
     if (!feePayment.studentFeeId) return toast.error("Select a fee record");
@@ -345,6 +608,15 @@ export default function StudentDashboard() {
             >
               Submit Homework
             </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "halfday"}
+              className={activeTab === "halfday" ? styles.tabActive : styles.tab}
+              onClick={() => setActiveTab("halfday")}
+            >
+              Half-Day Request
+            </button>
           </div>
 
           {activeTab === "overview" && (
@@ -488,31 +760,75 @@ export default function StudentDashboard() {
           )}
 
           {activeTab === "attendance" && (
-            <section className={styles.cardWide}>
-              <h2>Attendance</h2>
+            <div className={styles.attendanceContainer}>
               {attendanceSummary ? (
-                <div className={styles.kvGrid}>
-                  <div>
-                    <div className={styles.k}>Total</div>
-                    <div className={styles.v}>{attendanceSummary.total}</div>
-                  </div>
-                  <div>
-                    <div className={styles.k}>Present</div>
-                    <div className={styles.v}>{attendanceSummary.present}</div>
-                  </div>
-                  <div>
-                    <div className={styles.k}>Absent</div>
-                    <div className={styles.v}>{attendanceSummary.absent}</div>
-                  </div>
-                  <div>
-                    <div className={styles.k}>Late</div>
-                    <div className={styles.v}>{attendanceSummary.late}</div>
-                  </div>
-                </div>
+                <>
+                  <section className={styles.card}>
+                    <h2>Attendance Statistics</h2>
+                    <div className={styles.kvGrid}>
+                      <div>
+                        <div className={styles.k}>Total</div>
+                        <div className={styles.v}>{attendanceSummary.total}</div>
+                      </div>
+                      <div>
+                        <div className={styles.k}>Present</div>
+                        <div className={styles.v}>{attendanceSummary.present}</div>
+                      </div>
+                      <div>
+                        <div className={styles.k}>Absent</div>
+                        <div className={styles.v}>{attendanceSummary.absent}</div>
+                      </div>
+                      <div>
+                        <div className={styles.k}>Late</div>
+                        <div className={styles.v}>{attendanceSummary.late}</div>
+                      </div>
+                    </div>
+                    <div className={styles.pieChartContainer}>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: "Present", value: attendanceSummary.present, color: "#10b981" },
+                              { name: "Absent", value: attendanceSummary.absent, color: "#ef4444" },
+                              { name: "Late", value: attendanceSummary.late, color: "#f59e0b" },
+                              { name: "Excused", value: attendanceSummary.excused || 0, color: "#6b7280" },
+                            ]}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={(props: any) => {
+                              const { name, percent } = props;
+                              const pct = percent ?? 0;
+                              return `${name || ""}: ${(pct * 100).toFixed(0)}%`;
+                            }}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {[
+                              { name: "Present", value: attendanceSummary.present, color: "#10b981" },
+                              { name: "Absent", value: attendanceSummary.absent, color: "#ef4444" },
+                              { name: "Late", value: attendanceSummary.late, color: "#f59e0b" },
+                              { name: "Excused", value: attendanceSummary.excused || 0, color: "#6b7280" },
+                            ].map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </section>
+                  <section className={styles.card}>
+                    <h2>Attendance Calendar</h2>
+                    <AttendanceCalendar records={attendanceRecords} holidays={holidays} />
+                  </section>
+                </>
               ) : (
                 <div className={styles.muted}>No attendance data yet.</div>
               )}
-            </section>
+            </div>
           )}
 
           {activeTab === "holidays" && (
@@ -673,6 +989,116 @@ export default function StudentDashboard() {
                 <div className={styles.muted}>No assignments available to submit.</div>
               )}
             </section>
+          )}
+
+          {activeTab === "halfday" && (
+            <div className={styles.grid}>
+              <section className={styles.card}>
+                <h2>Request Half-Day</h2>
+                <div className={styles.formGridWide}>
+                  <input
+                    type="date"
+                    value={halfDayRequest.date}
+                    onChange={(e) =>
+                      setHalfDayRequest((r) => ({ ...r, date: e.target.value }))
+                    }
+                    min={new Date().toISOString().split("T")[0]}
+                  />
+                  <select
+                    value={halfDayRequest.halfDayType}
+                    onChange={(e) =>
+                      setHalfDayRequest((r) => ({ ...r, halfDayType: e.target.value }))
+                    }
+                  >
+                    <option value="morning">Morning Half-Day</option>
+                    <option value="afternoon">Afternoon Half-Day</option>
+                  </select>
+                  <textarea
+                    placeholder="Reason for half-day request..."
+                    value={halfDayRequest.reason}
+                    onChange={(e) =>
+                      setHalfDayRequest((r) => ({ ...r, reason: e.target.value }))
+                    }
+                    rows={4}
+                  />
+                  <button
+                    onClick={async () => {
+                      if (!halfDayRequest.date) {
+                        toast.error("Please select a date");
+                        return;
+                      }
+                      if (USE_FAKE_DATA) {
+                        const newRequest = {
+                          _id: `HD_${Date.now()}`,
+                          date: new Date(halfDayRequest.date).toISOString(),
+                          halfDayType: halfDayRequest.halfDayType,
+                          reason: halfDayRequest.reason,
+                          status: "pending",
+                        };
+                        setHalfDayRequests([...halfDayRequests, newRequest]);
+                        toast.success("Half-day request submitted");
+                        setHalfDayRequest({ date: "", halfDayType: "morning", reason: "" });
+                      } else {
+                        try {
+                          const res = await fetch(`${API}/students/${studentId}/half-day-requests`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(halfDayRequest),
+                          });
+                          const json = await res.json();
+                          if (json.success) {
+                            toast.success("Half-day request submitted");
+                            setHalfDayRequest({ date: "", halfDayType: "morning", reason: "" });
+                            // Reload requests
+                            const reqRes = await fetch(`${API}/students/${studentId}/half-day-requests`);
+                            const reqJson = await reqRes.json();
+                            if (reqJson.success) setHalfDayRequests(reqJson.requests || []);
+                          } else {
+                            toast.error(json.message || "Failed to submit request");
+                          }
+                        } catch (e: any) {
+                          toast.error(e?.message || "Failed to submit request");
+                        }
+                      }
+                    }}
+                    className={styles.primaryBtn}
+                  >
+                    Submit Request
+                  </button>
+                </div>
+              </section>
+              <section className={styles.card}>
+                <h2>My Half-Day Requests</h2>
+                {halfDayRequests.length ? (
+                  <ul className={styles.list}>
+                    {halfDayRequests.map((req: any) => (
+                      <li key={req._id} className={styles.listItem}>
+                        <div className={styles.liTitle}>
+                          {new Date(req.date).toLocaleDateString()} - {req.halfDayType === "morning" ? "Morning" : "Afternoon"}
+                          <span
+                            className={`${styles.pill} ${
+                              req.status === "approved"
+                                ? styles.good
+                                : req.status === "rejected"
+                                  ? styles.warn
+                                  : ""
+                            }`}
+                          >
+                            {req.status}
+                          </span>
+                        </div>
+                        <div className={styles.liMeta}>
+                          {req.reason && `Reason: ${req.reason}`}
+                          {req.verifiedBy && ` · Verified by: ${req.verifiedBy.fullName}`}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className={styles.muted}>No half-day requests yet.</div>
+                )}
+              </section>
+            </div>
           )}
         </>
       )}
