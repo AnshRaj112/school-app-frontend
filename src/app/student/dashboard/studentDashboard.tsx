@@ -248,6 +248,40 @@ const FAKE_DASHBOARD: DashboardData = {
     { _id: "H3", title: "Independence Day", date: new Date(Date.now() + 5 * 86400000).toISOString() },
     { _id: "H4", title: "Diwali", date: new Date(Date.now() + 45 * 86400000).toISOString() },
   ],
+  notices: [
+    {
+      _id: "N1",
+      title: "Annual Sports Day Registration",
+      content: "Registration for Annual Sports Day is now open. Please submit your forms by February 15th.",
+      postedBy: "Principal",
+      postedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+      priority: "high",
+    },
+    {
+      _id: "N2",
+      title: "Library Hours Extended",
+      content: "The school library will now be open until 6 PM on weekdays for better access to study materials.",
+      postedBy: "Librarian",
+      postedAt: new Date(Date.now() - 5 * 86400000).toISOString(),
+      priority: "normal",
+    },
+    {
+      _id: "N3",
+      title: "Parent-Teacher Meeting",
+      content: "Scheduled for February 20th, 2026. Please ensure your parents attend to discuss your progress.",
+      postedBy: "Class Teacher",
+      postedAt: new Date(Date.now() - 1 * 86400000).toISOString(),
+      priority: "high",
+    },
+    {
+      _id: "N4",
+      title: "Science Fair Project Submission",
+      content: "Science fair projects are due by March 1st. Submit your projects to your science teacher.",
+      postedBy: "Science Department",
+      postedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+      priority: "normal",
+    },
+  ],
   timetable: [
     {
       _id: "T1",
@@ -351,9 +385,11 @@ export default function StudentDashboard() {
   const [submission, setSubmission] = useState({
     assignmentId: "",
     submissionText: "",
-    attachmentUrl: "",
-    attachmentName: "",
+    attachments: [] as Array<{ type: string; url: string; name: string; file?: File }>,
   });
+  const [uploadMethod, setUploadMethod] = useState<"file" | "drive" | "link">("file");
+  const [linkInput, setLinkInput] = useState("");
+  const [linkName, setLinkName] = useState("");
 
   const [halfDayRequest, setHalfDayRequest] = useState({
     date: "",
@@ -394,6 +430,7 @@ export default function StudentDashboard() {
   const payments = useMemo(() => data?.payments || [], [data]);
   const timetable = useMemo(() => data?.timetable || [], [data]);
   const holidays = useMemo(() => data?.holidaysUpcoming || [], [data]);
+  const notices = useMemo(() => data?.notices || [], [data]);
   const attendanceSummary = useMemo(() => data?.attendance?.summary || null, [data]);
   const attendanceRecords = useMemo(() => data?.attendance?.recent || [], [data]);
 
@@ -461,48 +498,6 @@ export default function StudentDashboard() {
     }
   }
 
-  async function submitHomework() {
-    if (!submission.assignmentId) return toast.error("Select an assignment");
-
-    const attachments =
-      submission.attachmentUrl.trim() !== ""
-        ? [
-            {
-              url: submission.attachmentUrl.trim(),
-              name: submission.attachmentName?.trim() || undefined,
-            },
-          ]
-        : [];
-
-    if (USE_FAKE_DATA) {
-      setData((prev: any) => {
-        if (!prev) return prev;
-        const assignments = Array.isArray(prev.assignments) ? prev.assignments : [];
-        const updated = assignments.map((a: any) =>
-          a._id === submission.assignmentId
-            ? {
-                ...a,
-                mySubmission: {
-                  status: "submitted",
-                  submittedAt: new Date().toISOString(),
-                  submissionText: submission.submissionText,
-                  attachments,
-                },
-              }
-            : a
-        );
-        return { ...prev, assignments: updated };
-      });
-      toast.success("Submitted (fake)");
-      setSubmission({
-        assignmentId: "",
-        submissionText: "",
-        attachmentUrl: "",
-        attachmentName: "",
-      });
-      return;
-    }
-  }
 
   return (
     <div className={styles.wrapper}>
@@ -662,6 +657,37 @@ export default function StudentDashboard() {
                   </ul>
                 ) : (
                   <div className={styles.muted}>No upcoming holidays.</div>
+                )}
+              </section>
+
+              <section className={styles.cardWide}>
+                <h2>Notice Board</h2>
+                {notices.length ? (
+                  <ul className={styles.list}>
+                    {notices.map((notice: any) => (
+                      <li
+                        key={notice._id}
+                        className={`${styles.listItem} ${
+                          notice.priority === "high" ? styles.noticeHigh : ""
+                        }`}
+                      >
+                        <div className={styles.liTitle}>
+                          {notice.title}
+                          {notice.priority === "high" && (
+                            <span className={styles.pill} style={{ background: "#ef4444", color: "white" }}>
+                              Important
+                            </span>
+                          )}
+                        </div>
+                        <div className={styles.liMeta}>{notice.content}</div>
+                        <div className={styles.liMeta} style={{ fontSize: "11px", marginTop: "4px" }}>
+                          Posted by {notice.postedBy} · {new Date(notice.postedAt).toLocaleDateString()}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className={styles.muted}>No notices available.</div>
                 )}
               </section>
 
@@ -965,23 +991,247 @@ export default function StudentDashboard() {
                     }
                     rows={6}
                   />
-                  <div className={styles.row2}>
-                    <input
-                      placeholder="Attachment URL (optional)"
-                      value={submission.attachmentUrl}
-                      onChange={(e) =>
-                        setSubmission((s) => ({ ...s, attachmentUrl: e.target.value }))
-                      }
-                    />
-                    <input
-                      placeholder="Attachment name (optional)"
-                      value={submission.attachmentName}
-                      onChange={(e) =>
-                        setSubmission((s) => ({ ...s, attachmentName: e.target.value }))
-                      }
-                    />
+
+                  <div className={styles.uploadSection}>
+                    <h3>Add Attachments</h3>
+                    <p className={styles.uploadHint}>Choose how you want to attach your files:</p>
+                    
+                    <div className={styles.uploadMethods}>
+                      {/* File Upload Method */}
+                      <div className={styles.uploadMethodCard}>
+                        <div className={styles.uploadMethodHeader}>
+                          <span className={styles.uploadIcon}>📱</span>
+                          <h4>Upload from Device</h4>
+                        </div>
+                        <p className={styles.uploadMethodDesc}>Upload files directly from your phone or computer</p>
+                        <input
+                          id="file-upload"
+                          type="file"
+                          multiple
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || []);
+                            const newAttachments = files.map((file) => ({
+                              type: "file",
+                              url: URL.createObjectURL(file),
+                              name: file.name,
+                              file,
+                            }));
+                            setSubmission((s) => ({
+                              ...s,
+                              attachments: [...s.attachments, ...newAttachments],
+                            }));
+                            toast.success(`${files.length} file(s) added`);
+                            // Reset input
+                            e.target.value = "";
+                          }}
+                          className={styles.fileInput}
+                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                        />
+                        <label htmlFor="file-upload" className={styles.fileInputLabel}>
+                          📎 Choose Files
+                        </label>
+                      </div>
+
+                      {/* Google Drive Method */}
+                      <div className={styles.uploadMethodCard}>
+                        <div className={styles.uploadMethodHeader}>
+                          <span className={styles.uploadIcon}>☁️</span>
+                          <h4>Google Drive Link</h4>
+                        </div>
+                        <p className={styles.uploadMethodDesc}>Paste a shareable Google Drive link</p>
+                        <div className={styles.uploadContent}>
+                          <input
+                            type="text"
+                            placeholder="Paste Google Drive share link..."
+                            value={uploadMethod === "drive" ? linkInput : ""}
+                            onChange={(e) => {
+                              setLinkInput(e.target.value);
+                              setUploadMethod("drive");
+                            }}
+                            onFocus={() => setUploadMethod("drive")}
+                          />
+                          <input
+                            type="text"
+                            placeholder="File name (optional)"
+                            value={uploadMethod === "drive" ? linkName : ""}
+                            onChange={(e) => {
+                              setLinkName(e.target.value);
+                              setUploadMethod("drive");
+                            }}
+                            onFocus={() => setUploadMethod("drive")}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (linkInput.trim()) {
+                                setSubmission((s) => ({
+                                  ...s,
+                                  attachments: [
+                                    ...s.attachments,
+                                    {
+                                      type: "drive",
+                                      url: linkInput.trim(),
+                                      name: linkName.trim() || "Google Drive File",
+                                    },
+                                  ],
+                                }));
+                                setLinkInput("");
+                                setLinkName("");
+                                toast.success("Google Drive link added");
+                              } else {
+                                toast.error("Please enter a Google Drive link");
+                              }
+                            }}
+                            className={styles.secondaryBtn}
+                          >
+                            Add Drive Link
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* URL/Link Method */}
+                      <div className={styles.uploadMethodCard}>
+                        <div className={styles.uploadMethodHeader}>
+                          <span className={styles.uploadIcon}>🔗</span>
+                          <h4>External Link/URL</h4>
+                        </div>
+                        <p className={styles.uploadMethodDesc}>Add a link to a file hosted elsewhere</p>
+                        <div className={styles.uploadContent}>
+                          <input
+                            type="text"
+                            placeholder="Paste file URL or link..."
+                            value={uploadMethod === "link" ? linkInput : ""}
+                            onChange={(e) => {
+                              setLinkInput(e.target.value);
+                              setUploadMethod("link");
+                            }}
+                            onFocus={() => setUploadMethod("link")}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Link name/description (optional)"
+                            value={uploadMethod === "link" ? linkName : ""}
+                            onChange={(e) => {
+                              setLinkName(e.target.value);
+                              setUploadMethod("link");
+                            }}
+                            onFocus={() => setUploadMethod("link")}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (linkInput.trim()) {
+                                setSubmission((s) => ({
+                                  ...s,
+                                  attachments: [
+                                    ...s.attachments,
+                                    {
+                                      type: "link",
+                                      url: linkInput.trim(),
+                                      name: linkName.trim() || "External Link",
+                                    },
+                                  ],
+                                }));
+                                setLinkInput("");
+                                setLinkName("");
+                                toast.success("Link added");
+                              } else {
+                                toast.error("Please enter a URL");
+                              }
+                            }}
+                            className={styles.secondaryBtn}
+                          >
+                            Add Link
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {submission.attachments.length > 0 && (
+                      <div className={styles.attachmentsList}>
+                        <h4>Attachments ({submission.attachments.length}):</h4>
+                        <ul>
+                          {submission.attachments.map((att, idx) => (
+                            <li key={idx} className={styles.attachmentItem}>
+                              <span>
+                                {att.type === "file" ? "📎" : att.type === "drive" ? "☁️" : "🔗"}{" "}
+                                {att.name}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSubmission((s) => ({
+                                    ...s,
+                                    attachments: s.attachments.filter((_, i) => i !== idx),
+                                  }));
+                                }}
+                                className={styles.removeBtn}
+                              >
+                                ✕
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
-                  <button onClick={submitHomework} className={styles.primaryBtn}>
+
+                  <button
+                    onClick={async () => {
+                      if (!submission.assignmentId) {
+                        toast.error("Please select an assignment");
+                        return;
+                      }
+
+                      const attachments = submission.attachments.map((att) => ({
+                        url: att.url,
+                        name: att.name,
+                        fileType: att.type === "file" ? "file" : att.type === "drive" ? "drive" : "link",
+                        fileSize: att.file?.size,
+                      }));
+
+                      if (USE_FAKE_DATA) {
+                        toast.success("Homework submitted successfully!");
+                        setSubmission({
+                          assignmentId: "",
+                          submissionText: "",
+                          attachments: [],
+                        });
+                        setLinkInput("");
+                        setLinkName("");
+                      } else {
+                        try {
+                          const res = await fetch(
+                            `${API}/students/${studentId}/assignments/${submission.assignmentId}/submission`,
+                            {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                submissionText: submission.submissionText,
+                                attachments,
+                              }),
+                            }
+                          );
+                          const json = await res.json();
+                          if (json.success) {
+                            toast.success("Homework submitted successfully!");
+                            setSubmission({
+                              assignmentId: "",
+                              submissionText: "",
+                              attachments: [],
+                            });
+                            setLinkInput("");
+                            setLinkName("");
+                          } else {
+                            toast.error(json.message || "Failed to submit");
+                          }
+                        } catch (e: any) {
+                          toast.error(e?.message || "Failed to submit");
+                        }
+                      }
+                    }}
+                    className={styles.primaryBtn}
+                  >
                     Submit
                   </button>
                 </div>
